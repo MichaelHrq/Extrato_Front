@@ -110,7 +110,11 @@ export default function Home() {
           </Form.Text>
         </Form.Group>
 
-        <Button type="submit">Enviar</Button>
+        <div className="d-flex justify-content-center">
+         <Button style={{width:'100px'}} type="submit">Enviar</Button>
+        </div>
+
+        
       </Form>
     </Container>
   )
