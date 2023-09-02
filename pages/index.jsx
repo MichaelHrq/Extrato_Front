@@ -1,10 +1,10 @@
-import { useForm, useFieldArray } from "react-hook-form";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { Button, Container, Form, Stack } from "react-bootstrap";
-import { CgClose } from "react-icons/cg";
-import { IoMdAdd } from "react-icons/io";
-import axios from "axios";
+import { useForm, useFieldArray } from "react-hook-form"
+import * as yup from "yup"
+import { yupResolver } from "@hookform/resolvers/yup"
+import { Button, Container, Form, Stack } from "react-bootstrap"
+import { CgClose } from "react-icons/cg"
+import { IoMdAdd } from "react-icons/io"
+import axios from "axios"
 
 export default function Home() {
   const schema = yup.object().shape({
@@ -12,8 +12,8 @@ export default function Home() {
       .mixed()
       .required("Selecione um arquivo PDF")
       .test("fileFormat", "Apenas arquivos PDF são permitidos.", (value) => {
-        if (!value) return false;
-        return value[0] instanceof File && value[0].type === "application/pdf";
+        if (!value) return false
+        return value[0] instanceof File && value[0].type === "application/pdf"
       }),
     words: yup
       .array()
@@ -23,26 +23,26 @@ export default function Home() {
         })
       )
       .min(1, "Digite pelo menos 1 palavra"),
-  });
+  })
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
-  } = useForm({ resolver: yupResolver(schema) });
+  } = useForm({ resolver: yupResolver(schema) })
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "words",
-  });
+  })
 
   function adicionar() {
-    append({ word: "" });
+    append({ word: "" })
   }
 
   function remover(index) {
-    remove(index);
+    remove(index)
   }
 
   async function submit (data) {
@@ -54,7 +54,7 @@ export default function Home() {
         headers: { "Content-Type": "multipart/form-data" },
       }).then(res => console.log(res)).catch(err => console.log(err))
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   }
 
@@ -102,7 +102,7 @@ export default function Home() {
                   )}
                 </Form.Text>
               </div>
-            );
+            )
           })}
 
           <Form.Text className="text-danger">
@@ -113,5 +113,5 @@ export default function Home() {
         <Button type="submit">Enviar</Button>
       </Form>
     </Container>
-  );
+  )
 }
