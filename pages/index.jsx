@@ -4,6 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Container, Form, Stack } from "react-bootstrap";
 import { CgClose } from "react-icons/cg";
 import { IoMdAdd } from "react-icons/io";
+import axios from "axios";
 
 export default function Home() {
   const schema = yup.object().shape({
@@ -19,7 +20,6 @@ export default function Home() {
       .of(
         yup.object().shape({
           word: yup.string().required("O campo não pode estar vazio").trim(),
-          idade: yup.number().integer().required(),
         })
       )
       .min(1, "Digite pelo menos 1 palavra"),
@@ -46,16 +46,13 @@ export default function Home() {
   }
 
   async function submit (data) {
-    // const formData = new FormData();
-    // formData.append("file", file);
     try {
       const response = await axios({
         method: "post",
-        url: "http://127.0.0.1:5000/pdf",
+        url: "http://127.0.0.1:8080/pdf",
         data: data,
         headers: { "Content-Type": "multipart/form-data" },
-      });
-      setExtratos(response.data);
+      }).then(res => console.log(res)).catch(err => console.log(err))
     } catch (error) {
       console.log(error);
     }
@@ -113,7 +110,7 @@ export default function Home() {
           </Form.Text>
         </Form.Group>
 
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Enviar</Button>
       </Form>
     </Container>
   );
