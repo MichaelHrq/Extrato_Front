@@ -1,10 +1,10 @@
-import { useForm, useFieldArray } from "react-hook-form"
-import * as yup from "yup"
-import { yupResolver } from "@hookform/resolvers/yup"
-import { Button, Container, Form, Stack } from "react-bootstrap"
-import { CgClose } from "react-icons/cg"
-import { IoMdAdd } from "react-icons/io"
-import axios from "axios"
+import { useForm, useFieldArray } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Button, Container, Form, Stack } from "react-bootstrap";
+import { CgClose } from "react-icons/cg";
+import { IoMdAdd } from "react-icons/io";
+import axios from "axios";
 
 export default function Home() {
   const schema = yup.object().shape({
@@ -12,8 +12,8 @@ export default function Home() {
       .mixed()
       .required("Selecione um arquivo PDF")
       .test("fileFormat", "Apenas arquivos PDF são permitidos.", (value) => {
-        if (!value) return false
-        return value[0] instanceof File && value[0].type === "application/pdf"
+        if (!value) return false;
+        return value[0] instanceof File && value[0].type === "application/pdf";
       }),
     words: yup
       .array()
@@ -23,38 +23,40 @@ export default function Home() {
         })
       )
       .min(1, "Digite pelo menos 1 palavra"),
-  })
+  });
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
-  } = useForm({ resolver: yupResolver(schema) })
+  } = useForm({ resolver: yupResolver(schema) });
 
   const { fields, append, remove } = useFieldArray({
     control,
     name: "words",
-  })
+  });
 
   function adicionar() {
-    append({ word: "" })
+    append({ word: "" });
   }
 
   function remover(index) {
-    remove(index)
+    remove(index);
   }
 
-  async function submit (data) {
+  async function submit(data) {
     try {
       const response = await axios({
         method: "post",
         url: "http://127.0.0.1:8080/pdf",
         data: data,
         headers: { "Content-Type": "multipart/form-data" },
-      }).then(res => console.log(res)).catch(err => console.log(err))
+      })
+        .then((res) => console.log(res))
+        .catch((err) => console.log(err));
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   }
 
@@ -91,8 +93,15 @@ export default function Home() {
             return (
               <div key={field.id}>
                 <Form.Group className="mt-3 d-flex gap-1" controlId="inputWord">
-                  <Form.Control type="text" {...register(`words[${index}].word`)}/>
-                  <Button variant="outline-danger" className="border-0" onClick={remover}>
+                  <Form.Control
+                    type="text"
+                    {...register(`words[${index}].word`)}
+                  />
+                  <Button
+                    variant="outline-danger"
+                    className="border-0"
+                    onClick={remover}
+                  >
                     <CgClose fill="3rem" />
                   </Button>
                 </Form.Group>
@@ -102,7 +111,7 @@ export default function Home() {
                   )}
                 </Form.Text>
               </div>
-            )
+            );
           })}
 
           <Form.Text className="text-danger">
@@ -111,11 +120,11 @@ export default function Home() {
         </Form.Group>
 
         <div className="d-flex justify-content-center">
-         <Button style={{width:'100px'}} type="submit">Enviar</Button>
+          <Button style={{ width: "100px" }} type="submit">
+            Enviar
+          </Button>
         </div>
-
-        
       </Form>
     </Container>
-  )
+  );
 }
