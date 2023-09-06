@@ -1,29 +1,15 @@
 import { useForm, useFieldArray } from "react-hook-form";
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Button, Container, Form, Stack } from "react-bootstrap";
+import { Button, Container, Form, Spinner, Stack } from "react-bootstrap";
 import { CgClose } from "react-icons/cg";
 import { IoMdAdd } from "react-icons/io";
 import axios from "axios";
+import { schema } from "@/schema/pdf";
+import { useState } from "react";
+import { saveAs } from "file-saver";
 
 export default function Home() {
-  const schema = yup.object().shape({
-    file: yup
-      .mixed()
-      .required("Selecione um arquivo PDF")
-      .test("fileFormat", "Apenas arquivos PDF são permitidos.", (value) => {
-        if (!value) return false;
-        return value[0] instanceof File && value[0].type === "application/pdf";
-      }),
-    words: yup
-      .array()
-      .of(
-        yup.object().shape({
-          word: yup.string().required("O campo não pode estar vazio").trim(),
-        })
-      )
-      .min(1, "Digite pelo menos 1 palavra"),
-  });
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -46,19 +32,33 @@ export default function Home() {
   }
 
   async function submit(data) {
+    setLoading(true);
     try {
       const response = await axios({
         method: "post",
-        url: "http://127.0.0.1:8080/pdf",
+        url: "http://127.0.0.1:8080/pdf2excel",
         data: data,
         headers: { "Content-Type": "multipart/form-data" },
+        responseType: 'blob'
       })
-        .then((res) => console.log(res))
-        .catch((err) => console.log(err));
+      if (response.status === 200 && response.data instanceof Blob) {
+        const data = await response.data.arrayBuffer();
+        downloadExcelFile(data);
+      } else {
+        console.error('Erro ao obter o arquivo Excel');
+      }
     } catch (error) {
       console.log(error);
     }
+    setLoading(false);
   }
+
+  const downloadExcelFile = (data) => {
+    const blob = new Blob([data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(blob, 'excel_file.xlsx');
+  };
 
   return (
     <Container className="d-flex justify-content-center">
@@ -100,7 +100,7 @@ export default function Home() {
                   <Button
                     variant="outline-danger"
                     className="border-0"
-                    onClick={remover}
+                    onClick={()=>remover(index)}
                   >
                     <CgClose fill="3rem" />
                   </Button>
@@ -119,9 +119,19 @@ export default function Home() {
           </Form.Text>
         </Form.Group>
 
-        <div className="d-flex justify-content-center">
+        <div className="d-flex justify-content-center gap-2">
           <Button style={{ width: "100px" }} type="submit">
-            Enviar
+            {loading ? (
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />
+            ) : (
+              "Enviar"
+            )}
           </Button>
         </div>
       </Form>
